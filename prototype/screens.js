@@ -132,7 +132,7 @@ const homeScreen = (mode) => {
     <div class="section-title" style="margin-top:var(--sp-6)">快速查詢</div>
     <div class="card">
       <div class="card__body">
-        <div class="grid" style="grid-template-columns:1fr 1fr;gap:var(--sp-4)">
+        <div class="grid grid--2" style="gap:var(--sp-4)">
           <div class="field" style="margin:0">
             <label class="field__label" for="q-from">出發站 <span class="field__req">必填</span></label>
             <input class="input" id="q-from" value="臺北" list="st" role="combobox" aria-expanded="false" aria-describedby="q-from-hint">
@@ -145,7 +145,7 @@ const homeScreen = (mode) => {
           </div>
         </div>
         <datalist id="st"><option value="臺北"></option><option value="臺中"></option><option value="高雄"></option><option value="桃園"></option><option value="新竹"></option></datalist>
-        <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:var(--sp-4);margin-top:var(--sp-4)">
+        <div class="grid grid--3" style="gap:var(--sp-4);margin-top:var(--sp-4)">
           <div class="field" style="margin:0">
             <label class="field__label" for="q-date">出發日期</label>
             <input class="input" id="q-date" type="date" value="2026-10-09">
@@ -193,7 +193,7 @@ const a2 = () => `
   <div class="card" style="margin-bottom:var(--sp-5)">
     <div class="card__head"><h2 class="card__title">查詢條件</h2></div>
     <div class="card__body">
-      <div class="grid" style="grid-template-columns:1fr auto 1fr;gap:var(--sp-4);align-items:end">
+      <div class="grid grid--stations" style="gap:var(--sp-4);align-items:end">
         <div class="field" style="margin:0">
           <label class="field__label" for="from">出發站 <span class="field__req" aria-hidden="true">*</span></label>
           <input class="input" id="from" value="臺北" list="st2" role="combobox" aria-expanded="false" aria-describedby="from-err from-hint">
@@ -212,14 +212,14 @@ const a2 = () => `
 
       <hr style="border:0;border-top:1px solid var(--c-border);margin:var(--sp-5) 0">
 
-      <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:var(--sp-4);align-items:end">
+      <div class="grid grid--3" style="gap:var(--sp-4);align-items:end">
         <div class="field" style="margin:0">
           <label class="field__label" for="date">出發日期</label>
           <input class="input" id="date" type="date" value="2026-10-09">
         </div>
         <div class="field" style="margin:0">
           <span class="field__label" id="tz-label">出發時段</span>
-          <div style="display:flex;align-items:center;gap:var(--sp-2)">
+          <div class="tz-selects">
             <select class="select" id="tz1" aria-label="起始時間"><option selected>06:00</option><option>09:00</option><option>12:00</option></select>
             <span aria-hidden="true">至</span>
             <select class="select" id="tz2" aria-label="結束時間"><option selected>23:59</option><option>18:00</option><option>21:00</option></select>
@@ -277,7 +277,7 @@ const a3 = () => `
     </div>
   </div>
 
-  <div class="grid" style="grid-template-columns:1fr 268px;gap:var(--sp-5);align-items:start">
+  <div class="grid grid--result" style="gap:var(--sp-5);align-items:start">
     <div>
       <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3)">
         <h2 style="font-size:var(--fs-md)">符合條件的車次（24）</h2>

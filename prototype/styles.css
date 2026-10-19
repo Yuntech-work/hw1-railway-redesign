@@ -245,6 +245,15 @@ main:focus { outline: none; }
 .grid { display: grid; gap: var(--sp-4); }
 .grid--3 { grid-template-columns: repeat(3, 1fr); }
 .grid--2 { grid-template-columns: repeat(2, 1fr); }
+.grid--result { grid-template-columns: 1fr 268px; }
+.grid--stations { grid-template-columns: 1fr auto 1fr; }
+@media (max-width: 980px) {
+  .grid--result { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .grid--stations { grid-template-columns: 1fr; }
+  .grid--stations .swap { margin: 0 auto; }
+}
 
 /* 首頁任務卡 */
 .task {
@@ -282,6 +291,9 @@ main:focus { outline: none; }
 }
 .input[aria-invalid="true"] { border-color: var(--c-error); background: var(--c-error-light); }
 .select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--c-text-2) 50%), linear-gradient(135deg, var(--c-text-2) 50%, transparent 50%); background-position: calc(100% - 20px) 22px, calc(100% - 14px) 22px; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 40px; }
+
+.tz-selects { display: flex; align-items: center; gap: var(--sp-2); }
+.tz-selects .select { flex: 1; min-width: 0; }
 
 .swap {
   align-self: center; background: var(--c-surface); border: 2px solid var(--c-border-strong);
@@ -412,6 +424,10 @@ main:focus { outline: none; }
   border: 2px solid var(--c-border); border-radius: var(--r-lg);
   padding: var(--sp-4); background: var(--c-surface); margin-bottom: var(--sp-3); cursor: pointer;
 }
+@media (max-width: 640px) {
+  .plan { flex-wrap: wrap; }
+  .plan__price { margin-left: 0; width: 100%; text-align: left; margin-top: var(--sp-2); }
+}
 .plan:hover { border-color: var(--c-primary); }
 .plan[data-selected="true"] { border-color: var(--c-primary); background: var(--c-primary-light); }
 .plan input { width: 24px; height: 24px; margin-top: 4px; accent-color: var(--c-primary); flex: none; }
@@ -505,6 +521,7 @@ main:focus { outline: none; }
   .train { grid-template-columns: 180px 1fr; }
   .train__act { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; }
   .summary { gap: var(--sp-3); }
+.summary__route { flex-wrap: wrap; }
   .summary__act { margin-left: 0; width: 100%; }
   .summary__act .btn { flex: 1; }
   .main { padding: var(--sp-5) var(--sp-4) var(--sp-7); }
@@ -529,6 +546,13 @@ main:focus { outline: none; }
   .page-title { font-size: var(--fs-lg); }
   .btn--lg { min-height: 52px; font-size: var(--fs-sm); padding: 0 var(--sp-4); }
   .backtop { right: 12px; bottom: 12px; width: 42px; height: 42px; }
+
+  /* A2 查詢表單：手機版改為單欄排列 */
+  .card__body .grid { grid-template-columns: 1fr !important; }
+
+  /* 出發時段：手機版改為垂直排列 */
+  div.tz-selects { flex-direction: column !important; align-items: stretch !important; gap: var(--sp-2) !important; }
+  .tz-selects span { text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
