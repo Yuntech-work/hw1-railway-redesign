@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <nav class="crumb-dark" aria-label="麵包屑"><a href="{% url 'railway:home' %}">首頁</a> ／ 訂票 ／ <b>查詢條件</b></nav>
+  <h1 class="page-title">訂票查詢</h1>
+  <p class="page-sub">請選擇出發與抵達車站、日期與時段。查詢結果會一覽列出所有符合的車次，並標示票價與剩餘座位。</p>
+
+  <form method="get" action="{% url 'railway:results' %}">
+    <div class="card" style="margin-bottom:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">查詢條件</h2></div>
+      <div class="card__body">
+        <div class="grid grid--stations" style="gap:var(--sp-4);align-items:end">
+          <div class="field" style="margin:0">
+            <label class="field__label" for="from">出發站 <span class="field__req" aria-hidden="true">*</span></label>
+            <input class="input" id="from" name="from" value="{{ default_from }}" list="stations-from" data-station-autocomplete autocomplete="off" required>
+            <div class="field__hint" id="from-hint">輸入後請從建議清單中選擇</div>
+          </div>
+          <button class="swap" type="button" id="swap-stations" title="交換出發站與抵達站" aria-label="交換出發站與抵達站">⇄</button>
+          <div class="field" style="margin:0">
+            <label class="field__label" for="to">抵達站 <span class="field__req" aria-hidden="true">*</span></label>
+            <input class="input" id="to" name="to" value="{{ default_to }}" list="stations-to" data-station-autocomplete autocomplete="off" required>
+            <div class="field__hint" id="to-hint">輸入後請從建議清單中選擇</div>
+          </div>
+        </div>
+        <datalist id="stations-from">{% for station in stations %}<option value="{{ station.name }}">{{ station.city }}</option>{% endfor %}</datalist>
+        <datalist id="stations-to">{% for station in stations %}<option value="{{ station.name }}">{{ station.city }}</option>{% endfor %}</datalist>
+
+        <hr style="border:0;border-top:1px solid var(--c-border);margin:var(--sp-5) 0">
+
+        <div class="grid grid--3" style="gap:var(--sp-4);align-items:end">
+          <div class="field" style="margin:0">
+            <label class="field__label" for="date">出發日期</label>
+            <input class="input" id="date" name="date" type="date" value="{{ default_date }}" min="{{ today|date:'Y-m-d' }}" max="{{ max_date|date:'Y-m-d' }}">
+          </div>
+          <div class="field" style="margin:0">
+            <span class="field__label" id="tz-label">出發時段</span>
+            <div class="tz-selects" style="display:flex;gap:var(--sp-2);align-items:center">
+              <select class="select" id="tz1" name="start" aria-label="起始時間">
+                <option value="06:00" {% if default_start == '06:00' %}selected{% endif %}>06:00</option>
+                <option value="09:00" {% if default_start == '09:00' %}selected{% endif %}>09:00</option>
+                <option value="12:00" {% if default_start == '12:00' %}selected{% endif %}>12:00</option>
+                <option value="15:00" {% if default_start == '15:00' %}selected{% endif %}>15:00</option>
+                <option value="18:00" {% if default_start == '18:00' %}selected{% endif %}>18:00</option>
+              </select>
+              <span aria-hidden="true">至</span>
+              <select class="select" id="tz2" name="end" aria-label="結束時間">
+                <option value="23:59" {% if default_end == '23:59' %}selected{% endif %}>23:59</option>
+                <option value="18:00" {% if default_end == '18:00' %}selected{% endif %}>18:00</option>
+                <option value="21:00" {% if default_end == '21:00' %}selected{% endif %}>21:00</option>
+                <option value="12:00" {% if default_end == '12:00' %}selected{% endif %}>12:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin:0">
+            <label class="field__label" for="ticket_type">票種需求</label>
+            <select class="select" id="ticket_type" name="ticket_type">
+              {% for ticket in ticket_types %}
+                <option value="{{ ticket.code }}" {% if default_ticket_type == ticket.code %}selected{% endif %}>{{ ticket.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:var(--sp-5)">
+          <button class="btn btn--accent btn--lg" type="submit">查詢班次</button>
+          <a class="btn btn--quiet" href="{% url 'railway:search' %}">清除條件</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="helper">
+    <span class="text-small">查詢結果只顯示 <b>15 天內</b>的班次。若要查詢更早日期，請改用「時刻表查詢」。目前示範資料保留最近 15 天。</span>
+  </div>
+</div>
+{% endblock %}

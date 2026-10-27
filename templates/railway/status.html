@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="narrow">
+    <h1 class="page-title">服務資訊</h1>
+    <p class="page-sub">查看目前系統狀態、維護公告與替代服務通路。若你正在訂票，遇到異常時不會讓你卡在死路。</p>
+
+    {% if demo_maintenance %}
+      <div class="alert alert--warn" style="font-size:var(--fs-md)">
+        <div class="alert__title" style="font-size:var(--fs-lg)">⚠ 訂票系統目前暫停服務</div>
+        <div class="alert__body">
+          因系統升級，<b>線上訂票</b>服務已暫停。<br>
+          預計 <b>2026 年 11 月 14 日 00:00 – 06:00</b> 恢復。<br>
+          查詢列車時刻、班次與票價不受影響，仍可正常使用。
+        </div>
+      </div>
+    {% endif %}
+
+    {% for status in statuses %}
+      {% if status.status != 'normal' %}
+        <div class="alert alert--warn" style="font-size:var(--fs-md)">
+          <div class="alert__title" style="font-size:var(--fs-lg)">⚠ {{ status.get_system_display }}目前{{ status.get_status_display }}</div>
+          <div class="alert__body">
+            {{ status.message }}
+            {% if status.expected_recovery_at %}<br>預計 <b>{{ status.expected_recovery_at|date:"Y 年 n 月 j 日 H:i" }}</b> 恢復。{% endif %}
+            <br>查詢列車時刻、班次與票價不受影響，仍可正常使用。
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if statuses %}
+      <div class="card" style="margin-bottom:var(--sp-5)">
+        <div class="card__head"><h2 class="card__title">系統狀態</h2></div>
+        <div class="card__body">
+          <div class="table-wrap">
+            <table class="table table--compact">
+              <thead><tr><th>系統</th><th>狀態</th><th>說明</th><th>更新時間</th></tr></thead>
+              <tbody>
+                {% for status in statuses %}
+                  <tr>
+                    <td>{{ status.get_system_display }}</td>
+                    <td><span class="badge {% if status.status == 'normal' %}badge--paid{% elif status.status == 'maintenance' %}badge--pending{% else %}badge--cancelled{% endif %}">{{ status.get_status_display }}</span></td>
+                    <td>{{ status.message|default:"—" }}</td>
+                    <td class="nowrap">{{ status.updated_at|date:"Y/m/d H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% for item in announcements %}
+      <div class="alert alert--{{ item.kind }}">
+        <div class="alert__title">{{ item.title }}</div>
+        <div class="alert__body">{{ item.body|linebreaksbr }}</div>
+      </div>
+    {% endfor %}
+
+    <div class="card" style="margin-bottom:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">你可以先做這些</h2></div>
+      <div class="card__body">
+        <div class="linklist">
+          <a href="{% url 'railway:results' %}"><span>查詢列車時刻與班次</span><span>→</span></a>
+          <a href="{% url 'railway:fares' %}"><span>查看票價與優惠規則</span><span>→</span></a>
+          <a href="{% url 'railway:search' %}"><span>重新嘗試訂票</span><span>→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">需要馬上訂票？改用這些方式</h2></div>
+      <div class="card__body">
+        <div class="grid grid--3">
+          <div><div style="font-weight:700">車站窗口</div><p class="text-small muted">各大車站售票窗口仍可購買</p></div>
+          <div><div style="font-weight:700">自動售票機</div><p class="text-small muted">可刷卡或使用台灣Pay</p></div>
+          <div><div style="font-weight:700">電話訂票</div><p class="text-small muted">服務時間 06:00 – 24:00</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h2 class="card__title">聯絡客服</h2></div>
+      <div class="card__body">
+        <dl class="kv">
+          <dt>台鐵客服專線</dt><dd>1933（軌道、隧道等緊急通報專用）</dd>
+          <dt>一般服務電話</dt><dd>02-2191-0096（代表號，24 小時）</dd>
+          <dt>客服信箱</dt><dd>service@railway.gov.tw（2 個工作天內回覆）</dd>
+        </dl>
+        <div class="btn-row" style="margin-top:var(--sp-4)">
+          <a class="btn btn--primary" href="{% url 'railway:search' %}">重新嘗試訂票</a>
+          <button class="btn btn--ghost" type="button" onclick="location.reload()">重新整理狀態</button>
+        </div>
+        <p class="text-small muted" style="margin-top:var(--sp-3)">本頁狀態由 Django 後台管理；示範維護畫面可用 <code>?demo=maintenance</code> 預覽。</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <nav class="crumb-dark" aria-label="麵包屑"><a href="{% url 'railway:booking_ticket' trip.pk %}">選擇票種</a> ／ <b>乘車人資料</b></nav>
+  <h1 class="page-title">填寫乘車人資料</h1>
+  <p class="page-sub">請依乘車人證件填寫。資料將用於出票與進站核對，請勿填寫他人資料。</p>
+
+  <div class="alert alert--warn">
+    <div class="alert__title">⚠ 身分驗證說明</div>
+    <div class="alert__body">本頁為課程 Demo，不會儲存信用卡資料；付款流程為模擬付款。完成後會產生電子票與訂單編號。</div>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}
+      <div class="alert alert--err"><div class="alert__body">{{ formset.non_form_errors }}</div></div>
+    {% endif %}
+
+    {% for form in formset %}
+      <div class="card" style="margin-bottom:var(--sp-5)">
+        <div class="card__head"><h2 class="card__title">乘車人 {{ forloop.counter }}{% if forloop.first %}（本人）{% endif %}</h2></div>
+        <div class="card__body">
+          {% if form.non_field_errors %}<div class="alert alert--err"><div class="alert__body">{{ form.non_field_errors }}</div></div>{% endif %}
+          <div class="form-grid">
+            <div class="field">
+              <label class="field__label" for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="field__req">必填</span></label>
+              {{ form.name }}
+              {% if form.name.errors %}<div class="field__err">{{ form.name.errors }}</div>{% endif %}
+              <div class="field__hint">請填寫與身分證完全相同的中文姓名</div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }} <span class="field__req">必填</span></label>
+              {{ form.id_number }}
+              {% if form.id_number.errors %}<div class="field__err">{{ form.id_number.errors }}</div>{% endif %}
+              <div class="field__hint">格式：A123456789</div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+              {{ form.birth_date }}
+              {% if form.birth_date.errors %}<div class="field__err">{{ form.birth_date.errors }}</div>{% endif %}
+            </div>
+            <div class="field">
+              <label class="field__label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }} <span class="field__req">必填</span></label>
+              {{ form.phone }}
+              {% if form.phone.errors %}<div class="field__err">{{ form.phone.errors }}</div>{% endif %}
+              <div class="field__hint">訂票結果與電子票會以此號碼通知</div>
+            </div>
+            <div class="field field--full">
+              <label class="field__label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="field__err">{{ form.email.errors }}</div>{% endif %}
+              <div class="field__hint">電子票會同時寄到這個信箱（選填）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="card">
+      <div class="card__head"><h2 class="card__title">付款方式</h2></div>
+      <div class="card__body">
+        <div class="grid grid--2" style="gap:var(--sp-3)">
+          {% for value, label in payment_choices %}
+            <label class="plan" data-selected="{% if selected_payment == value %}true{% else %}false{% endif %}" style="margin:0">
+              <input type="radio" name="payment_method" value="{{ value }}" {% if selected_payment == value %}checked{% endif %}>
+              <div><div class="plan__t">{{ label }}</div><div class="plan__d">{% if value == 'credit_card' %}課程 Demo 使用模擬付款，不會傳送卡號{% elif value == 'mobile_pay' %}手機錢包快速付款（模擬）{% else %}請於車站窗口付款取票{% endif %}</div></div>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:var(--sp-5);align-items:center;flex-wrap:wrap;margin-top:var(--sp-5)">
+      <button class="btn btn--accent btn--lg" type="submit">確認訂票內容</button>
+      <a class="btn btn--quiet" href="{% url 'railway:booking_ticket' trip.pk %}">← 上一步</a>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:var(--fs-sm);color:var(--c-text-2)">應付金額（{{ passenger_count }} 人）</div>
+        <div style="font-size:var(--fs-lg);font-weight:800">${{ fare.total_amount }}</div>
+        <div class="text-small muted">{{ ticket_type.name }} × {{ passenger_count }}{% if fare.e_ticket_discount %}，已折 ${{ fare.e_ticket_discount }}{% endif %}</div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

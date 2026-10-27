@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="auth-wrap">
+    <div class="card">
+      <div class="card__head"><h1 class="card__title" style="font-size:var(--fs-lg)">建立會員帳號</h1></div>
+      <div class="card__body">
+        <p class="muted text-small" style="margin-bottom:var(--sp-5)">建立帳號後即可訂票、保存乘車人資料與查看電子票。所有欄位都會依 Django 密碼規則驗證。</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert--err"><div class="alert__body">{{ form.non_field_errors }}</div></div>{% endif %}
+          {% for field in form %}
+            <div class="field">
+              <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="field__req">必填</span>{% endif %}</label>
+              {{ field }}
+              {% if field.errors %}<div class="field__err">{{ field.errors }}</div>{% endif %}
+              {% if field.help_text %}<div class="field__hint">{{ field.help_text|safe }}</div>{% endif %}
+            </div>
+          {% endfor %}
+          <button class="btn btn--accent btn--lg btn--block" type="submit">註冊並登入</button>
+        </form>
+        <div class="auth-alt">已經有帳號？<a href="{% url 'railway:login' %}">回到登入</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="member-hero" style="margin-bottom:var(--sp-5)">
+    <div>
+      <h1 class="page-title" style="margin-bottom:4px">我的訂票</h1>
+      <p class="page-sub" style="margin-bottom:0">你好，{{ user.display_name }}。這裡保存你的訂票紀錄與電子票。</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn--primary" href="{% url 'railway:search' %}">再訂一張票</a>
+      <a class="btn btn--ghost" href="{% url 'railway:profile' %}">會員資料</a>
+    </div>
+  </div>
+
+  <div class="grid grid--3" style="margin-bottom:var(--sp-5)">
+    <div class="card"><div class="card__body"><div class="text-small muted">全部訂票</div><div style="font-size:var(--fs-xl);font-weight:800">{{ counts.total }}</div></div></div>
+    <div class="card"><div class="card__body"><div class="text-small muted">已付款</div><div style="font-size:var(--fs-xl);font-weight:800;color:var(--c-success)">{{ counts.paid }}</div></div></div>
+    <div class="card"><div class="card__body"><div class="text-small muted">已取消</div><div style="font-size:var(--fs-xl);font-weight:800;color:var(--c-error)">{{ counts.cancelled }}</div></div></div>
+  </div>
+
+  <div class="chips" style="margin-bottom:var(--sp-4)" role="group" aria-label="訂單狀態篩選">
+    <a class="chip" href="{% url 'railway:my_bookings' %}" aria-pressed="{% if status == 'all' %}true{% else %}false{% endif %}">全部</a>
+    <a class="chip" href="{% url 'railway:my_bookings' %}?status=paid" aria-pressed="{% if status == 'paid' %}true{% else %}false{% endif %}">已付款</a>
+    <a class="chip" href="{% url 'railway:my_bookings' %}?status=cancelled" aria-pressed="{% if status == 'cancelled' %}true{% else %}false{% endif %}">已取消</a>
+    <a class="chip" href="{% url 'railway:my_bookings' %}?status=pending" aria-pressed="{% if status == 'pending' %}true{% else %}false{% endif %}">待付款</a>
+  </div>
+
+  {% if bookings %}
+    <div class="stack">
+      {% for booking in bookings %}
+        <article class="card">
+          <div class="card__body">
+            <div class="member-hero">
+              <div>
+                <div class="text-small muted">訂單 {{ booking.order_no }}｜{{ booking.created_at|date:"Y/m/d H:i" }}</div>
+                <div class="card__title" style="font-size:var(--fs-lg);margin:4px 0">{{ booking.trip.origin.name }} → {{ booking.trip.destination.name }}</div>
+                <div class="muted">
+                  {{ booking.trip.travel_date|date:"Y 年 n 月 j 日（D）" }}｜{{ booking.trip.train.train_type.name }} {{ booking.trip.train.number }} {{ booking.trip.departure_time|time:"H:i" }}–{{ booking.trip.arrival_time|time:"H:i" }}
+                  ｜{{ booking.ticket_type.name }} × {{ booking.passenger_count }}
+                </div>
+              </div>
+              <div style="text-align:right">
+                <div class="ticket-card__price">${{ booking.total_amount }}<small>{{ booking.get_payment_method_display }}</small></div>
+                <span class="badge badge--{{ booking.status }}">{{ booking.status_label }}</span>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:var(--sp-4)">
+              <a class="btn btn--primary" href="{% url 'railway:booking_complete' booking.order_no %}">查看電子票</a>
+              {% if booking.is_cancellable %}
+                <form method="post" action="{% url 'railway:cancel_booking' booking.order_no %}" onsubmit="return confirm('確定要取消這張訂單嗎？座位將釋出。');">
+                  {% csrf_token %}
+                  <button class="btn btn--ghost" type="submit">取消訂票</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pagination" aria-label="分頁">
+        {% if page_obj.has_previous %}<a href="?status={{ status }}&page={{ page_obj.previous_page_number }}">上一頁</a>{% else %}<span class="disabled">上一頁</span>{% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}<span class="current" aria-current="page">{{ num }}</span>{% else %}<a href="?status={{ status }}&page={{ num }}">{{ num }}</a>{% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}<a href="?status={{ status }}&page={{ page_obj.next_page_number }}">下一頁</a>{% else %}<span class="disabled">下一頁</span>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty card">
+      <div class="empty__title">還沒有符合條件的訂票紀錄</div>
+      <p>從查詢班次開始，完成後就會出現在這裡。</p>
+      <div class="btn-row" style="justify-content:center;margin-top:var(--sp-4)">
+        <a class="btn btn--primary" href="{% url 'railway:search' %}">查詢班次</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

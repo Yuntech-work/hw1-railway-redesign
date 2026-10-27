@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="narrow">
+    <div class="success-mark" aria-hidden="true">✓</div>
+    <h1 style="text-align:center;font-size:var(--fs-xl);margin-bottom:var(--sp-2)">訂票完成</h1>
+    <p style="text-align:center;color:var(--c-text-2);margin-bottom:var(--sp-6)">
+      訂單 <b>#{{ booking.order_no }}</b> 已成立，電子票已準備完成。
+    </p>
+
+    <div class="alert alert--ok">
+      <div class="alert__title">✓ 接下來請這樣做</div>
+      <div class="alert__body">乘車時請出示下方電子票 QR code；若手機沒電，可至車站自動售票機以「訂單代號 + 身分證字號」取紙本票。</div>
+    </div>
+
+    <div class="card" style="margin-bottom:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">訂票明細</h2></div>
+      <div class="card__body">
+        <dl class="kv">
+          <dt>車次</dt><dd>{{ booking.trip.train.train_type.name }} {{ booking.trip.train.number }}（{{ booking.trip_carriage.carriage_type.name|default:"標準車廂" }}）</dd>
+          <dt>行程</dt><dd>{{ booking.trip.origin.name }} {{ booking.trip.departure_time|time:"H:i" }} → {{ booking.trip.destination.name }} {{ booking.trip.arrival_time|time:"H:i" }}</dd>
+          <dt>乘車日期</dt><dd>{{ booking.trip.travel_date|date:"Y 年 n 月 j 日（D）" }}</dd>
+          <dt>乘車人</dt>
+          <dd>
+            {% for passenger in passengers %}
+              {{ passenger.name }}{% if passenger.is_primary %}（主要乘車人）{% endif %}{% if not forloop.last %}、{% endif %}
+            {% empty %}—{% endfor %}
+            （{{ booking.ticket_type.name }} × {{ booking.passenger_count }}）
+          </dd>
+          <dt>票價</dt><dd>{{ booking.ticket_type.name }} ${{ booking.unit_fare }} × {{ booking.passenger_count }}　合計 ${{ booking.total_amount }}</dd>
+          <dt>付款方式</dt><dd>{{ booking.get_payment_method_display }}（{{ booking.status_label }}）</dd>
+          <dt>取票方式</dt><dd>電子票／可至車站取紙本票</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">電子票 QR code</h2></div>
+      <div class="card__body">
+        <div class="ticket-qr">
+          <img src="{% url 'railway:booking_qr' booking.order_no %}" alt="訂單 {{ booking.order_no }} 的電子票 QR code">
+          <div>
+            <div class="card__title" style="font-size:var(--fs-md)">訂單 {{ booking.order_no }}</div>
+            <p class="ticket-qr__note">進站時請將 QR code 對準閘門感應區。此為課程 Demo 電子票，不會連動真實臺鐵系統。</p>
+            <div class="btn-row mt-4">
+              <a class="btn btn--primary" href="{% url 'railway:booking_qr' booking.order_no %}" target="_blank" rel="noopener">另開 QR code</a>
+              <button class="btn btn--ghost" type="button" onclick="window.print()">列印訂單明細</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h2 class="card__title">取票／報到進度</h2></div>
+      <div class="card__body">
+        <div class="meter" role="progressbar" aria-label="訂票完成進度" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="margin-bottom:var(--sp-3)">
+          <div class="meter__fill" style="width:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:var(--fs-sm);color:var(--c-text-2);margin-bottom:var(--sp-4);gap:8px;flex-wrap:wrap">
+          <span>① 查詢完成</span><span>② 填寫完成</span><span>③ 付款完成</span><span>④ 取票完成</span>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="{% url 'railway:my_bookings' %}">查看我的訂票</a>
+          <a class="btn btn--ghost" href="{% url 'railway:search' %}">再訂一張票</a>
+          <a class="btn btn--ghost" href="{% url 'railway:home' %}">回首頁</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

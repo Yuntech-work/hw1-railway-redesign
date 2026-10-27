@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main main--flush">
+  <div class="summary">
+    <div>
+      <div class="summary__route">{{ origin.name }} <span class="summary__arrow">→</span> {{ destination.name }}</div>
+      <div class="summary__when">
+        {{ travel_date|date:"Y 年 n 月 j 日（D）" }}｜出發時段 {{ start_time|time:"H:i" }} – {{ end_time|time:"H:i" }}｜<b>共 {{ total_count }} 班</b>
+      </div>
+    </div>
+    <div class="summary__act">
+      <a class="btn btn--ghost" href="{% url 'railway:search' %}?from={{ origin.name|urlencode }}&to={{ destination.name|urlencode }}&date={{ travel_date|date:'Y-m-d' }}">修改條件</a>
+      {% if trips %}<a class="btn btn--primary" href="{% url 'railway:booking_carriage' trips.0.pk %}">直接訂第一班</a>{% endif %}
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:var(--sp-5)">
+    <div class="card__body" style="padding:var(--sp-4) var(--sp-5)">
+      <div class="chips" role="group" aria-label="篩選條件">
+        <span style="font-size:var(--fs-xs);font-weight:700;color:var(--c-text-2);margin-right:4px">快速篩選</span>
+        {% for item in type_links %}
+          <a class="chip" href="{{ item.url }}" aria-pressed="{{ item.active|yesno:'true,false' }}">{{ item.obj.name }}{% if item.active %} <span class="chip__x">✕</span>{% endif %}</a>
+        {% endfor %}
+        <a class="chip" href="{{ filter_links.discount }}" aria-pressed="{{ discount|yesno:'true,false' }}">有優惠票{% if discount %} <span class="chip__x">✕</span>{% endif %}</a>
+        <a class="chip" href="{{ filter_links.available }}" aria-pressed="{{ available|yesno:'true,false' }}">有座位{% if available %} <span class="chip__x">✕</span>{% endif %}</a>
+        <a class="chip" href="{{ filter_links.pet }}" aria-pressed="{{ pet|yesno:'true,false' }}">可攜帶寵物{% if pet %} <span class="chip__x">✕</span>{% endif %}</a>
+        <a href="?from={{ origin.name|urlencode }}&to={{ destination.name|urlencode }}&date={{ travel_date|date:'Y-m-d' }}" style="font-size:var(--fs-xs);font-weight:700;margin-left:6px">清除全部篩選</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid--result" style="gap:var(--sp-5);align-items:start">
+    <div>
+      <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);flex-wrap:wrap">
+        <h2 style="font-size:var(--fs-md)">符合條件的車次（{{ total_count }}）</h2>
+        <div class="seg" style="margin-left:auto" role="group" aria-label="排序">
+          <a class="btn btn--quiet" href="{{ sort_time_url }}" style="min-height:36px;padding:0 12px" {% if sort == 'departure' %}aria-current="true"{% endif %}>依出發時間</a>
+          <a class="btn btn--quiet" href="{{ sort_price_url }}" style="min-height:36px;padding:0 12px" {% if sort == 'price' %}aria-current="true"{% endif %}>依票價</a>
+        </div>
+      </div>
+
+      <form id="compare-form" method="get" action="{% url 'railway:compare' %}">
+        <div class="trains">
+          {% for trip in trips %}
+            <article class="train train--{{ trip.train.train_type.category }} {% if trip.is_recommended %}train--best{% endif %}">
+              <div>
+                <div class="train__id">
+                  <span>{{ trip.train.number }}</span>
+                  <span class="train__kind">{{ trip.train.train_type.name }}</span>
+                  {% if trip.is_recommended %}<span class="tag tag--best">建議選擇</span>{% endif %}
+                  {% if trip.has_discount %}<span class="tag tag--disc">優惠車次</span>{% endif %}
+                  {% if trip.is_sold_out %}<span class="tag tag--full">已額滿</span>{% endif %}
+                </div>
+                <div class="train__via">經由 {{ trip.train.via|default:"—" }}｜剩餘 {{ trip.available_seats }} 席</div>
+              </div>
+              <div class="train__time">
+                <div>
+                  <div class="train__t">{{ trip.departure_time|time:"H:i" }}</div>
+                  <div class="train__dur">{{ trip.origin.name }} {{ trip.departure_time|time:"H:i" }}</div>
+                </div>
+                <div class="train__line" aria-hidden="true"></div>
+                <div>
+                  <div class="train__t">{{ trip.arrival_time|time:"H:i" }}</div>
+                  <div class="train__dur">{{ trip.destination.name }} {{ trip.arrival_time|time:"H:i" }}</div>
+                </div>
+                <div class="train__dur" style="margin-left:8px">{{ trip.duration_label }}</div>
+              </div>
+              <div class="train__act">
+                <div class="train__fare">
+                  <div class="train__price">${{ trip.full_fare }}<small>全票</small></div>
+                  {% if trip.has_discount %}<div class="text-small" style="color:var(--c-success);font-weight:700">優惠 ${{ trip.discount_fare }}</div>{% endif %}
+                </div>
+                {% if trip.is_bookable %}
+                  <a class="btn {% if trip.is_recommended %}btn--primary{% else %}btn--secondary{% endif %}" href="{% url 'railway:booking_carriage' trip.pk %}?ticket_type={{ selected_ticket_type|urlencode }}">訂票</a>
+                {% else %}
+                  <div class="train__full">本班已售完</div>
+                  <a class="btn btn--ghost" href="?from={{ origin.name|urlencode }}&to={{ destination.name|urlencode }}&date={{ travel_date|date:'Y-m-d' }}">查看其他班次</a>
+                {% endif %}
+                <label class="compare-check">
+                  <input type="checkbox" name="ids" value="{{ trip.pk }}"> 加入比較
+                </label>
+              </div>
+            </article>
+          {% empty %}
+            <div class="empty">
+              <div class="empty__title">這個條件下沒有符合的班次</div>
+              <p>試試看放寬時段、移除篩選，或改用其他日期。</p>
+              <div class="btn-row" style="justify-content:center;margin-top:var(--sp-4)">
+                <a class="btn btn--primary" href="{% url 'railway:search' %}">重新查詢</a>
+                <a class="btn btn--ghost" href="?from={{ origin.name|urlencode }}&to={{ destination.name|urlencode }}&date={{ travel_date|date:'Y-m-d' }}">清除篩選</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if trips %}
+          <div class="compare-bar mt-4">
+            <button id="compare-submit" class="btn btn--secondary" type="submit" disabled>比較勾選班次</button>
+            <span class="text-small muted">最多勾選 3 班，並排比較時間、票價與車廂。</span>
+          </div>
+        {% endif %}
+      </form>
+
+      {% if page_obj.has_other_pages %}
+        <nav class="pagination" aria-label="分頁">
+          {% if page_obj.has_previous %}
+            <a href="?{{ page_query }}&page={{ page_obj.previous_page_number }}">上一頁</a>
+          {% else %}
+            <span class="disabled">上一頁</span>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="current" aria-current="page">{{ num }}</span>
+            {% else %}
+              <a href="?{{ page_query }}&page={{ num }}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <a href="?{{ page_query }}&page={{ page_obj.next_page_number }}">下一頁</a>
+          {% else %}
+            <span class="disabled">下一頁</span>
+          {% endif %}
+        </nav>
+        <div class="pagination__meta center mt-4">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</div>
+      {% endif %}
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:var(--sp-4)">
+      <div class="card">
+        <div class="card__head"><h2 class="card__title" style="font-size:var(--fs-sm)">比較車次</h2></div>
+        <div class="card__body">
+          <p style="font-size:var(--fs-sm);color:var(--c-text-2)">勾選 2–3 班後按「比較勾選班次」，即可並排查看時間、票價與車廂。</p>
+          <div class="btn-row" style="margin-top:var(--sp-3)">
+            {% if trips|length > 1 %}
+              <a class="btn btn--secondary btn--block" href="{% url 'railway:compare' %}?ids={{ trips.0.pk }},{{ trips.1.pk }}">快速比較前兩班</a>
+            {% else %}
+              <span class="text-small muted">勾選至少 2 班後即可比較。</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__head"><h2 class="card__title" style="font-size:var(--fs-sm)">查詢說明</h2></div>
+        <div class="card__body" style="font-size:var(--fs-sm);color:var(--c-text-2)">
+          <p>「優惠票」為可拆分席位之價格，實際可售數量以訂票時為準。</p>
+          <p style="margin-top:var(--sp-2)">「已額滿」表示該班次所有席位均已售出，可查看相鄰班次。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__head"><h2 class="card__title" style="font-size:var(--fs-sm)">需要協助？</h2></div>
+        <div class="card__body" style="font-size:var(--fs-sm);color:var(--c-text-2)">
+          <p>客服專線 1933／02-2191-0096，或查看 <a href="{% url 'railway:status' %}">服務資訊</a>。</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

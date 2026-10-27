@@ -1,5 +1,18 @@
 {
+  "name": "railway-redesign",
+  "version": "1.0.0",
+  "private": true,
+  "description": "臺鐵乘車資訊服務 redesign — Django + Neon PostgreSQL",
+  "scripts": {
+    "build": "node scripts/py.mjs manage.py check && node scripts/py.mjs manage.py collectstatic --noinput",
+    "start": "node scripts/py.mjs manage.py runserver 127.0.0.1:8000",
+    "test": "node scripts/py.mjs manage.py test railway --keepdb",
+    "seed": "node scripts/py.mjs manage.py seed_demo",
+    "migrate": "node scripts/py.mjs manage.py migrate"
+  },
   "dependencies": {
+    "@neon/config": "^1.9.4",
+    "@neon/env": "^1.6.5",
     "docx": "^9.9.0"
   }
 }

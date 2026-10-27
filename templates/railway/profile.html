@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="narrow">
+    <h1 class="page-title">會員資料</h1>
+    <p class="page-sub">更新後的資料會用於下次訂票時自動帶入。身分證字號僅供訂票與取票核對。</p>
+
+    <form method="post" class="card">
+      {% csrf_token %}
+      <div class="card__head"><h2 class="card__title">基本資料</h2></div>
+      <div class="card__body">
+        {% if form.non_field_errors %}<div class="alert alert--err"><div class="alert__body">{{ form.non_field_errors }}</div></div>{% endif %}
+        <div class="form-grid">
+          <div class="field">
+            <label class="field__label" for="{{ form.last_name.id_for_label }}">姓</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="field__err">{{ form.last_name.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.first_name.id_for_label }}">名字</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="field__err">{{ form.first_name.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.email.id_for_label }}">電子郵件</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="field__err">{{ form.email.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.phone.id_for_label }}">手機號碼</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="field__err">{{ form.phone.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.birth_date.id_for_label }}">出生日期</label>
+            {{ form.birth_date }}
+            {% if form.birth_date.errors %}<div class="field__err">{{ form.birth_date.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.id_number.id_for_label }}">身分證字號</label>
+            {{ form.id_number }}
+            {% if form.id_number.errors %}<div class="field__err">{{ form.id_number.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.preferred_font_scale.id_for_label }}">預設字級</label>
+            {{ form.preferred_font_scale }}
+            {% if form.preferred_font_scale.errors %}<div class="field__err">{{ form.preferred_font_scale.errors }}</div>{% endif %}
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--accent btn--lg" type="submit">儲存資料</button>
+          <a class="btn btn--quiet" href="{% url 'railway:my_bookings' %}">返回我的訂票</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="card" style="margin-top:var(--sp-5)">
+      <div class="card__head"><h2 class="card__title">常用乘車人</h2></div>
+      <div class="card__body">
+        {% if saved_passengers %}
+          <div class="table-wrap">
+            <table class="table table--compact">
+              <thead><tr><th>姓名</th><th>手機</th><th>Email</th><th>預設</th></tr></thead>
+              <tbody>
+                {% for person in saved_passengers %}
+                  <tr><td>{{ person.name }}</td><td>{{ person.phone }}</td><td>{{ person.email|default:"—" }}</td><td>{% if person.is_default %}<span class="badge badge--paid">預設</span>{% else %}—{% endif %}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="muted">完成一次訂票後，系統會自動儲存主要乘車人資料，下次訂票時自動帶入。</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="auth-wrap">
+    <div class="card">
+      <div class="card__head"><h1 class="card__title" style="font-size:var(--fs-lg)">登入會員</h1></div>
+      <div class="card__body">
+        <p class="muted text-small" style="margin-bottom:var(--sp-5)">登入後才能完成訂票、查看電子票與訂票紀錄。訪客仍可查詢班次與票價。</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert--err"><div class="alert__body">{{ form.non_field_errors }}</div></div>{% endif %}
+          <div class="field">
+            <label class="field__label" for="{{ form.username.id_for_label }}">帳號</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div class="field__err">{{ form.username.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            <label class="field__label" for="{{ form.password.id_for_label }}">密碼</label>
+            {{ form.password }}
+            {% if form.password.errors %}<div class="field__err">{{ form.password.errors }}</div>{% endif %}
+          </div>
+          <input type="hidden" name="next" value="{{ next }}">
+          <button class="btn btn--accent btn--lg btn--block" type="submit">登入</button>
+        </form>
+        <div class="auth-alt">還沒有帳號？<a href="{% url 'railway:signup' %}">建立會員帳號</a></div>
+      </div>
+    </div>
+
+    <div class="helper" style="margin-top:var(--sp-5)">
+      <span class="text-small">課程 Demo 測試帳號：會員 <b>user / user123</b>；管理員 <b>admin / admin123</b>（後台網址 <a href="/admin/">/admin/</a>）。</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

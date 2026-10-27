@@ -1,0 +1,128 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="臺鐵乘車資訊服務重新設計：任務導向查詢、無障礙大字模式、線上訂票與會員服務。">
+  <meta name="theme-color" content="#0B4F8F">
+  <title>{% block title %}{{ page_title|default:"臺鐵乘車資訊服務" }}｜臺鐵乘車資訊服務{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230B4F8F'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='800'%3E%E9%90%B5%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body data-fontscale="{{ font_scale }}">
+  <a class="skip" href="#main">跳至主要內容</a>
+  <div class="app">
+    <header class="appbar">
+      <div class="appbar__top">
+        <a class="brand" href="{% url 'railway:home' %}">
+          <span class="brand__mark" aria-hidden="true">鐵</span>
+          <span class="brand__txt">
+            <span class="brand__title">臺鐵乘車資訊服務</span>
+            <span class="brand__sub">Taiwan Railway e-Service</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="主要導覽">
+          <a href="{% url 'railway:home' %}" {% if nav_name == 'home' %}aria-current="page"{% endif %}>首頁</a>
+          <a href="{% url 'railway:search' %}" {% if nav_name == 'search' or nav_name == 'booking_carriage' or nav_name == 'booking_ticket' or nav_name == 'booking_passenger' %}aria-current="page"{% endif %}>訂票</a>
+          <a href="{% url 'railway:results' %}" {% if nav_name == 'results' or nav_name == 'compare' %}aria-current="page"{% endif %}>時刻查詢</a>
+          <a href="{% url 'railway:fares' %}" {% if nav_name == 'fares' %}aria-current="page"{% endif %}>票價與優惠</a>
+          <a href="{% url 'railway:status' %}" {% if nav_name == 'status' %}aria-current="page"{% endif %}>服務資訊</a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'railway:my_bookings' %}" {% if nav_name == 'my_bookings' %}aria-current="page"{% endif %}>我的訂票</a>
+          {% endif %}
+        </nav>
+        <div class="appbar__tools">
+          <button class="tool" type="button" id="fs-toggle" aria-pressed="{{ font_scale|yesno:'true,false' }}" title="放大畫面文字">大字</button>
+          {% if user.is_authenticated %}
+            <span class="tool tool--user" title="{{ user.username }}">你好，{{ user.display_name }}</span>
+            <a class="tool" href="{% url 'railway:profile' %}">會員</a>
+            <form method="post" action="{% url 'railway:logout' %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'railway:home' %}">
+              <button class="tool" type="submit">登出</button>
+            </form>
+          {% else %}
+            <a class="tool" href="{% url 'railway:login' %}?next={{ request.get_full_path|urlencode }}">登入</a>
+            <a class="tool" href="{% url 'railway:signup' %}">註冊</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="appbar__sub">
+        <div class="appbar__sub-in">
+          {% if service_status %}
+            <span class="status {% if service_status.status == 'maintenance' %}status--maintenance{% elif service_status.status == 'degraded' %}status--degraded{% endif %}">
+              {{ service_status.get_status_display }}
+            </span>
+          {% else %}
+            <span class="status">全線行車正常</span>
+          {% endif %}
+          {% if steps %}
+            <div class="steps" aria-label="目前進度">
+              {% for step in steps %}
+                <div class="steps__item" data-state="{% if forloop.last %}current{% else %}done{% endif %}">
+                  <span class="steps__dot">{{ forloop.counter }}</span><span>{{ step }}</span>
+                </div>
+                {% if not forloop.last %}<span class="steps__sep"></span>{% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <span class="text-small" style="color:#C9DCF2">系統狀態：{{ service_status.get_status_display|default:"正常" }}｜最後更新 {{ service_status.updated_at|date:"Y/m/d H:i"|default:"—" }}</span>
+          {% endif %}
+          <nav class="breadcrumb" aria-label="麵包屑" style="margin-left:auto">
+            <ul>
+              <li><a href="{% url 'railway:home' %}">首頁</a></li>
+              {% block breadcrumb %}{% if page_title and nav_name != 'home' %}<li><span>{{ page_title }}</span></li>{% endif %}{% endblock %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      {% if messages %}
+        <div class="main" style="padding-bottom:0">
+          <div class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+              <div class="alert alert--{{ message.tags }}">
+                <div class="alert__body">{{ message }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="appfoot">
+      <div class="appfoot__in">
+        <div>
+          <h3>臺鐵乘車資訊服務</h3>
+          <p>本網站提供臺灣鐵路行車資訊查詢、線上訂票與票價資訊。<br>
+          如有疑問請撥打 1933 或 02-2191-0096（代表號）。</p>
+        </div>
+        <div>
+          <h3>快速連結</h3>
+          <a href="{% url 'railway:search' %}">線上訂票</a>
+          <a href="{% url 'railway:results' %}">列車時刻查詢</a>
+          <a href="{% url 'railway:fares' %}">票價與優惠</a>
+          <a href="{% url 'railway:status' %}">服務資訊</a>
+        </div>
+        <div>
+          <h3>無障礙與政策</h3>
+          <a href="{% url 'railway:status' %}">無障礙服務聲明</a>
+          <a href="{% url 'railway:status' %}">隱私權政策</a>
+          <a href="{% url 'railway:status' %}">乘車條款</a>
+          <a href="{% url 'railway:status' %}">網站意見箱</a>
+        </div>
+      </div>
+      <div class="appfoot__bar">國營臺灣鐵路股份有限公司 ｜ 本頁為介面設計課程之重新設計系統，非正式服務</div>
+    </footer>
+  </div>
+  <button class="backtop" type="button" aria-label="回到頁面頂端" id="backtop">↑</button>
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

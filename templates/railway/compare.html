@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <nav class="crumb-dark" aria-label="麵包屑"><a href="{% url 'railway:home' %}">首頁</a> ／ <a href="{% url 'railway:search' %}">查詢條件</a> ／ <a href="{% url 'railway:results' %}?from={{ first_trip.origin.name|urlencode }}&to={{ first_trip.destination.name|urlencode }}&date={{ first_trip.travel_date|date:'Y-m-d' }}">查詢結果</a> ／ <b>比較車次</b></nav>
+  <h1 class="page-title">比較車次</h1>
+  <p class="page-sub">並排比較候選班次的出發時間、到達時間、票價與車廂種類，協助你快速決定。</p>
+
+  <div class="card" style="margin-bottom:var(--sp-5)">
+    <div class="card__body">
+      <div class="table-wrap">
+        <table class="cmp">
+          <caption>{{ first_trip.origin.name }} → {{ first_trip.destination.name }}，{{ first_trip.travel_date|date:"Y 年 n 月 j 日（D）" }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">比較項目</th>
+              {% for trip in trips %}
+                <th scope="col">{{ trip.train.train_type.name }} {{ trip.train.number }}{% if forloop.first %}（建議）{% endif %}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">出發時間</th>
+              {% for trip in trips %}<td>{{ trip.departure_time|time:"H:i" }}（{{ trip.origin.name }}）</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">到達時間</th>
+              {% for trip in trips %}<td class="{% if forloop.first %}is-best{% endif %}">{{ trip.arrival_time|time:"H:i" }}（{{ trip.destination.name }}）</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">行駛時間</th>
+              {% for trip in trips %}<td>{{ trip.duration_label }}</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">經由</th>
+              {% for trip in trips %}<td>{{ trip.train.via|default:"—" }}</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">全票</th>
+              {% for trip in trips %}<td class="{% if forloop.first %}is-best{% endif %}">${{ trip.full_fare }}</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">優惠票</th>
+              {% for trip in trips %}
+                <td>{% if trip.has_discount %}${{ trip.discount_fare }}（尚餘 {{ trip.available_seats }} 席）{% else %}—{% endif %}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">車廂種類</th>
+              {% for trip in trips %}
+                <td>
+                  {% for carriage in trip.tripcarriages.all %}
+                    {{ carriage.carriage_type.name }}{% if not forloop.last %} / {% endif %}
+                  {% empty %}—{% endfor %}
+                </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">是否適用電子票</th>
+              {% for trip in trips %}<td class="{% if forloop.first %}is-best{% endif %}">是</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">選擇</th>
+              {% for trip in trips %}
+                <td>
+                  {% if trip.is_bookable %}
+                    <a class="btn {% if forloop.first %}btn--primary{% else %}btn--ghost{% endif %} btn--block" href="{% url 'railway:booking_carriage' trip.pk %}">訂這班（{{ trip.departure_time|time:"H:i" }}）</a>
+                  {% else %}
+                    <span class="badge badge--cancelled">已售完</span>
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% if trips %}
+    <div class="alert alert--ok">
+      <div class="alert__title">✓ 建議選擇 {{ trips.0.train.train_type.name }} {{ trips.0.train.number }}（{{ trips.0.departure_time|time:"H:i" }}）</div>
+      <div class="alert__body">出發時間與剩餘席位綜合評估後，這班最適合你的查詢條件。若需要無障礙座位或鄰近洗手間，請在乘車人資料備註。</div>
+    </div>
+  {% endif %}
+
+  <div class="btn-row mt-4">
+    <a class="btn btn--quiet" href="{% url 'railway:results' %}?from={{ first_trip.origin.name|urlencode }}&to={{ first_trip.destination.name|urlencode }}&date={{ first_trip.travel_date|date:'Y-m-d' }}">← 返回查詢結果</a>
+  </div>
+</div>
+{% endblock %}

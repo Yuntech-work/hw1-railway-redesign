@@ -2,6 +2,17 @@
 
 案例網站：**國營臺灣鐵路股份有限公司 官方網站** — https://www.railway.gov.tw/
 
+> **期中專題後端已加入**：本專案現在同時包含原本的靜態 redesign 原型，以及可操作的 **Django + Neon PostgreSQL** 前後台。
+>
+> - 前台：`/`（Django 樣板沿用 `prototype/styles.css`）
+> - 後台：`/admin/`
+> - 測試會員：`user / user123`
+> - 測試管理員：`admin / admin123`
+> - 後端說明：`docs/BACKEND.md`
+> - Render 前台：部署後填入
+> - Render 後台：部署後填入
+
+
 ## 交付物
 
 | 檔案 | 說明 |
@@ -108,3 +119,84 @@ node build\server.js
 ## 生成式 AI 使用聲明
 
 報告內附有「生成式 AI 使用聲明」獨立頁（第 2 頁），列出工具名稱（Claude、OpenCode）、各工具的使用範圍與人工覆核方式；第 II、III、IV、VII、VIII 節另以綠框「生成式 AI 使用標注」標示該章節由 AI 協助的內容。資料定義於 `build/report.js` 的 `AI_TOOLS` 與 `AI_STATEMENT`。
+
+---
+
+## 期中專題後端（Django + Neon PostgreSQL）
+
+### 技術棧
+
+- Django 5.2 + Gunicorn + WhiteNoise
+- Neon PostgreSQL 18（production branch）
+- psycopg2-binary（本機 psycopg3 對 Neon TLS 交握會失敗，已改用 psycopg2）
+- Render Web Service（Singapore / Free）
+- 前端沿用 `prototype/styles.css` 的 Design System，改成 Django server-rendered templates
+
+### 本機啟動
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# Neon 專案已連結；若尚未連結：
+neon init -y --no-agent-setup --org-id org-fancy-water-62001387 --project-id wild-shape-74199559 --branch production --services postgres
+neon deploy
+
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py seed_demo
+npm run build
+npm start
+# http://127.0.0.1:8000/
+```
+
+### 測試帳號
+
+| 角色 | 帳號 | 密碼 | 入口 |
+|---|---|---|---|
+| 會員 | `user` | `user123` | `/accounts/login/` |
+| 管理員 | `admin` | `admin123` | `/admin/` |
+
+### 主要路由
+
+- `/` 首頁（`?mode=large` 大字、`?mode=novice` 新手導引）
+- `/search/` 查詢表單、`/search/results/` 結果與篩選
+- `/compare/` 班次比較
+- `/fares/` 票價與優惠
+- `/booking/<trip_id>/carriage/` → `/ticket/` → `/passenger/` → `/booking/complete/<order_no>/`
+- `/status/` 服務狀態（`?demo=maintenance` 預覽維護）
+- `/my/bookings/`、`/my/profile/`
+- `/admin/` Django 管理後台
+- `/api/stations/?q=` 車站 autocomplete
+- `/healthz/` 健康檢查
+
+### 建置與測試
+
+```powershell
+npm run build
+npm test
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+```
+
+`npm run build` 會執行 `manage.py check` 與 `collectstatic`；`npm test` 使用 Neon 測試資料庫（`--keepdb`）；`scripts/smoke_test.py` 會實際登入、查詢、訂票、產生 QR code、登入管理後台並查詢 Neon。
+
+### Neon 與 MCP
+
+- 專案層 MCP：`opencode.json`
+  - `Neon`：`https://mcp.neon.tech/mcp?projectId=wild-shape-74199559`（OAuth）
+  - `render`：`https://mcp.render.com/mcp`（重新啟動 OpenCode 後授權）
+- `neon.ts`：Neon config-as-code，`neon deploy` 套用。
+- `.env.local`、`.neon` 已在 `.gitignore`，不進版控。
+- 詳細架構與資料模型：`docs/BACKEND.md`
+- AI Prompt 紀錄位置：`docs/AI_PROMPTS.md`
+
+### Render 部署
+
+`render.yaml` 已建立並通過 `render blueprints validate`：
+
+- Web Service：`railway-redesign`
+- Build：`pip install -r requirements.txt` → `collectstatic` → `migrate` → `seed_demo`
+- Start：`gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+- Health check：`/healthz/`
+- 必要環境變數：`DATABASE_URL`、`SECRET_KEY`、`ALLOWED_HOSTS`、`CSRF_TRUSTED_ORIGINS`
+
+部署後前台與後台網址會補在本節與報告中。

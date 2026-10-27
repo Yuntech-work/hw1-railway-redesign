@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <nav class="crumb-dark" aria-label="麵包屑"><a href="{% url 'railway:home' %}">首頁</a> ／ <b>票價與優惠</b></nav>
+  <h1 class="page-title">票價與優惠說明</h1>
+  <p class="page-sub">以下票價依資料庫中的票價規則呈現。所有價格均含稅，無另加收服務費；實際可售數量以訂票時為準。</p>
+
+  <form method="get" class="card" style="margin-bottom:var(--sp-5)">
+    <div class="card__body">
+      <div class="grid grid--3" style="gap:var(--sp-4);align-items:end">
+        <div class="field" style="margin:0">
+          <label class="field__label" for="fare-from">出發站</label>
+          <select class="select" id="fare-from" name="from">
+            <option value="">全部</option>
+            {% for station in stations %}<option value="{{ station.name }}" {% if selected_from == station.name %}selected{% endif %}>{{ station.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field" style="margin:0">
+          <label class="field__label" for="fare-to">抵達站</label>
+          <select class="select" id="fare-to" name="to">
+            <option value="">全部</option>
+            {% for station in stations %}<option value="{{ station.name }}" {% if selected_to == station.name %}selected{% endif %}>{{ station.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div><button class="btn btn--secondary btn--block" type="submit">篩選票價</button></div>
+      </div>
+    </div>
+  </form>
+
+  <div class="section-title">票價規則</div>
+  <div class="table-wrap" style="margin-bottom:var(--sp-6)">
+    <table class="table">
+      <thead>
+        <tr><th>區間</th><th>車種</th><th class="num">全票</th><th class="num">優惠票</th><th class="num">學生票</th><th class="num">敬老票</th><th class="num">兒童票</th><th class="num">電子票折扣</th></tr>
+      </thead>
+      <tbody>
+        {% for rule in rules %}
+          <tr>
+            <td>{{ rule.origin.name }} → {{ rule.destination.name }}</td>
+            <td>{{ rule.train_type.name|default:"全部車種" }}</td>
+            <td class="num">${{ rule.full_fare }}</td>
+            <td class="num">{% if rule.discount_fare %}${{ rule.discount_fare }}{% else %}—{% endif %}</td>
+            <td class="num">{% if rule.student_fare %}${{ rule.student_fare }}{% else %}—{% endif %}</td>
+            <td class="num">{% if rule.senior_fare %}${{ rule.senior_fare }}{% else %}—{% endif %}</td>
+            <td class="num">{% if rule.child_fare %}${{ rule.child_fare }}{% else %}—{% endif %}</td>
+            <td class="num">{% if rule.e_ticket_discount %}折 ${{ rule.e_ticket_discount }}{% else %}—{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8" class="muted">目前沒有符合條件的票價規則。</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">我符合哪一種優惠？</div>
+  <div class="grid grid--3" style="margin-bottom:var(--sp-5)">
+    {% for ticket in ticket_types %}
+      <div class="card">
+        <div class="card__body">
+          <div class="ticket-card">
+            <div>
+              <div class="card__title" style="font-size:var(--fs-md)">{{ ticket.name }}</div>
+              <div class="ticket-card__meta">{{ ticket.description|default:"依票種規定辦理" }}</div>
+            </div>
+            <div class="ticket-card__price">{{ ticket.discount_percent }}%<small>票價比例</small></div>
+          </div>
+          {% if ticket.eligibility %}<p class="text-small muted mt-4">{{ ticket.eligibility }}</p>{% endif %}
+          {% if ticket.requires_document %}<div class="alert alert--warn" style="margin-top:var(--sp-3);padding:var(--sp-3)"><div class="alert__body">進站時須出示相關證件。</div></div>{% endif %}
+          <div class="btn-row mt-4">
+            <a class="btn btn--secondary" href="{% url 'railway:search' %}?ticket_type={{ ticket.code }}">用這個票種訂票</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty"><div class="empty__title">尚未建立票種</div></div>
+    {% endfor %}
+  </div>
+
+  <div class="alert alert--warn">
+    <div class="alert__title">⚠ 購買優惠票請攜帶證件</div>
+    <div class="alert__body">敬老票、學生票與兒童票須於進站時出示證件；若無法出示，將補收全票差額。若不確定資格，可先購買全票，於 24 小時內線上換票。</div>
+  </div>
+
+  <div class="btn-row mt-4">
+    <a class="btn btn--accent btn--lg" href="{% url 'railway:search' %}">開始查詢班次</a>
+    <a class="btn btn--ghost" href="{% url 'railway:results' %}">查看今日班次</a>
+  </div>
+</div>
+{% endblock %}

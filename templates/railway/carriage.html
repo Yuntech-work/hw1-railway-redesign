@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+  <nav class="crumb-dark" aria-label="麵包屑"><a href="{% url 'railway:home' %}">首頁</a> ／ <a href="{% url 'railway:search' %}">查詢條件</a> ／ <b>選擇車廂</b></nav>
+  <h1 class="page-title">選擇車廂與座位</h1>
+  <p class="page-sub">{{ trip.train.train_type.name }} {{ trip.train.number }}｜{{ trip.origin.name }} {{ trip.departure_time|time:"H:i" }} → {{ trip.destination.name }} {{ trip.arrival_time|time:"H:i" }}｜{{ trip.duration_label }}</p>
+
+  <div class="alert alert--info">
+    <div class="alert__title">乘車日期：{{ trip.travel_date|date:"Y 年 n 月 j 日（D）" }}</div>
+    <div class="alert__body">目前剩餘 {{ trip.available_seats }} 席。選位後系統會在下一步保留座位，完成付款前不會扣款。</div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="section-title">車廂種類</div>
+    <div class="card">
+      <div class="card__body">
+        {% for carriage in carriages %}
+          <label class="plan" data-selected="{% if carriage.available_seats > 0 and forloop.first %}true{% else %}false{% endif %}">
+            <input type="radio" name="carriage_id" value="{{ carriage.pk }}" {% if carriage.available_seats > 0 and forloop.first %}checked{% endif %} {% if carriage.available_seats == 0 %}disabled{% endif %} required>
+            <div>
+              <div class="plan__t">{{ carriage.carriage_type.name }}</div>
+              <div class="plan__d">{{ carriage.carriage_type.description|default:"依現場座位安排" }}（剩餘 {{ carriage.available_seats }} 席）</div>
+            </div>
+            <div class="plan__price" {% if carriage.available_seats == 0 %}style="color:var(--c-text-3)"{% endif %}>
+              ${{ carriage.fare }}<small>{% if carriage.available_seats == 0 %}暫無座位{% else %}全票{% endif %}</small>
+            </div>
+          </label>
+        {% empty %}
+          <div class="empty"><div class="empty__title">這個班次目前沒有可選車廂</div></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="alert alert--info" style="margin-top:var(--sp-5)">
+      <div class="alert__title">長者與行動不便旅客</div>
+      <div class="alert__body">指定座位時，系統會自動將部分座位保留為無障礙空間；若需靠門或鄰近洗手間座位，請於乘車人資料備註，我們將協助安排。</div>
+    </div>
+
+    <div class="btn-row" style="margin-top:var(--sp-5)">
+      <button class="btn btn--accent btn--lg" type="submit" {% if not carriages %}disabled{% endif %}>繼續選擇票種</button>
+      <a class="btn btn--quiet" href="{% url 'railway:search' %}?from={{ trip.origin.name|urlencode }}&to={{ trip.destination.name|urlencode }}&date={{ trip.travel_date|date:'Y-m-d' }}">← 重新查詢</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
