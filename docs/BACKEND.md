@@ -154,6 +154,7 @@ neon psql production -c "select current_database();"
 ```text
 前台：https://railway-redesign.onrender.com/
 後台：https://railway-redesign.onrender.com/admin/
+健康檢查：https://railway-redesign.onrender.com/healthz/
 ```
 
 > Render 免費方案一段時間未使用會休眠，第一次開啟可能需要數十秒喚醒。

@@ -9,8 +9,8 @@
 > - 測試會員：`user / user123`
 > - 測試管理員：`admin / admin123`
 > - 後端說明：`docs/BACKEND.md`
-> - Render 前台：部署後填入
-> - Render 後台：部署後填入
+> - Render 前台：https://railway-redesign.onrender.com/
+> - Render 後台：https://railway-redesign.onrender.com/admin/
 
 
 ## 交付物
@@ -199,4 +199,10 @@ npm test
 - Health check：`/healthz/`
 - 必要環境變數：`DATABASE_URL`、`SECRET_KEY`、`ALLOWED_HOSTS`、`CSRF_TRUSTED_ORIGINS`
 
-部署後前台與後台網址會補在本節與報告中。
+部署後前台與後台網址：
+
+- 前台：https://railway-redesign.onrender.com/
+- 後台：https://railway-redesign.onrender.com/admin/
+- 健康檢查：https://railway-redesign.onrender.com/healthz/
+
+> Render 免費方案一段時間未使用會休眠，第一次開啟可能需要數十秒喚醒。

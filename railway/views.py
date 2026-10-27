@@ -202,6 +202,7 @@ def compare(request):
         "trips": trips,
         "page_title": "比較車次",
         "first_trip": trips[0],
+        "recommended_trip": next((trip for trip in trips if trip.is_recommended), trips[0]),
     }
     return render(request, "railway/compare.html", context)
 
@@ -264,6 +265,7 @@ def booking_carriage(request, trip_id):
     context = {
         "trip": trip,
         "carriages": carriages,
+        "default_carriage_id": next((carriage.pk for carriage in carriages if carriage.available_seats > 0), None),
         "page_title": "選擇車廂",
         "steps": ["查詢條件", "選擇車廂"],
     }

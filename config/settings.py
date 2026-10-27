@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,6 +80,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+if not DATABASE_URL and not DEBUG:
+    raise ImproperlyConfigured(
+        "DATABASE_URL is required when DEBUG=0. Set it in Render (or .env.local for local production checks)."
+    )
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(

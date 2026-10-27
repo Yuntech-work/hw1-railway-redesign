@@ -17,8 +17,8 @@
     <div class="card">
       <div class="card__body">
         {% for carriage in carriages %}
-          <label class="plan" data-selected="{% if carriage.available_seats > 0 and forloop.first %}true{% else %}false{% endif %}">
-            <input type="radio" name="carriage_id" value="{{ carriage.pk }}" {% if carriage.available_seats > 0 and forloop.first %}checked{% endif %} {% if carriage.available_seats == 0 %}disabled{% endif %} required>
+          <label class="plan" data-selected="{% if carriage.pk == default_carriage_id %}true{% else %}false{% endif %}">
+            <input type="radio" name="carriage_id" value="{{ carriage.pk }}" {% if carriage.pk == default_carriage_id %}checked{% endif %} {% if carriage.available_seats == 0 %}disabled{% endif %} required>
             <div>
               <div class="plan__t">{{ carriage.carriage_type.name }}</div>
               <div class="plan__d">{{ carriage.carriage_type.description|default:"依現場座位安排" }}（剩餘 {{ carriage.available_seats }} 席）</div>
