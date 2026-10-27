@@ -15,6 +15,9 @@
 }
 @media (max-width: 640px) {
   .appbar__tools .tool--user { display: none; }
+  /* Keep the primary nav on one scrollable row instead of wrapping each label. */
+  .nav { flex-wrap: nowrap; }
+  .nav a { flex: 0 0 auto; white-space: nowrap; }
 }
 
 /* Messages */
