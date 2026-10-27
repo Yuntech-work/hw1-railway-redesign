@@ -2,6 +2,25 @@
 
 案例網站：**國營臺灣鐵路股份有限公司 官方網站** — https://www.railway.gov.tw/
 
+## 期中專題報告（2026/10/27）
+
+| 檔案 | 說明 |
+|---|---|
+| `output/介面設計_期中專題_臺鐵乘車資訊服務.docx` | 期中專題正式報告（55 頁，含 12 組 AI 對話卡片與正式站截圖） |
+| `output/介面設計_期中專題_臺鐵乘車資訊服務.pdf` | 同份報告的 PDF 版本 |
+| `build/report_midterm.js` | 期中報告產生器（docx-js） |
+| `build/topdf_midterm.ps1` | 以 Word COM 將最新 docx 轉為 PDF |
+| `assets/impl/` | 正式站（Render）實際操作截圖 |
+| `assets/chat/` | 12 組 AI 對話紀錄卡片（節錄重排） |
+| `report_src/ai_sessions.json`、`report_src/ai_transcript.md` | 本專案 OpenCode session 匯出與逐字稿 |
+
+重新產生期中報告：
+
+```powershell
+node build\report_midterm.js
+powershell -ExecutionPolicy Bypass -File build\topdf_midterm.ps1
+```
+
 > **期中專題後端已加入**：本專案現在同時包含原本的靜態 redesign 原型，以及可操作的 **Django + Neon PostgreSQL** 前後台。
 >
 > - 前台：`/`（Django 樣板沿用 `prototype/styles.css`）

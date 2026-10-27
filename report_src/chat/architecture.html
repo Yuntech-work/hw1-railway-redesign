@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif; background:#eef3fa; color:#152538; }
+  .canvas { width:1160px; height:760px; margin:20px; background:#fff; border:1px solid #cfdae7; border-radius:18px; padding:30px 40px; box-shadow:0 10px 30px rgba(15,30,50,.10); }
+  h1 { font-size:22px; margin:0 0 4px; color:#0b4f8f; }
+  .sub { font-size:13px; color:#5d7189; margin-bottom:18px; }
+  .row { display:flex; gap:16px; align-items:stretch; }
+  .layer { border-radius:14px; padding:14px 18px; border:1px solid #d6e2f0; background:#f8fbff; }
+  .layer h2 { font-size:15px; margin:0 0 8px; color:#0b4f8f; }
+  .layer p { font-size:12.5px; line-height:1.6; margin:0; color:#43505f; }
+  .client { width:100%; background:#fff7f1; border-color:#f0c9ae; }
+  .client h2 { color:#c43e06; }
+  .arrow { text-align:center; font-size:22px; color:#8aa4c0; line-height:1; margin:8px 0; }
+  .django { width:100%; background:#eef6ff; border-color:#b9d5f2; }
+  .modules { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:10px; }
+  .module { background:#fff; border:1px solid #d5e3f2; border-radius:10px; padding:10px 12px; }
+  .module b { display:block; font-size:12.5px; color:#163a5f; margin-bottom:3px; }
+  .module span { font-size:11px; color:#5d7189; line-height:1.45; }
+  .side { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .box { border-radius:12px; padding:12px 14px; border:1px dashed #b9cbe0; background:#fbfdff; }
+  .box b { font-size:13px; color:#0b4f8f; }
+  .box p { font-size:11.5px; margin:4px 0 0; color:#5d7189; line-height:1.5; }
+  .neon { background:#f2fffa; border:1px solid #b7e4d1; }
+  .neon h2 { color:#146b4a; }
+  .pill { display:inline-block; font-size:10.5px; color:#146b4a; background:#dcf5e9; border-radius:999px; padding:2px 8px; margin-right:5px; }
+  .foot { margin-top:14px; font-size:11px; color:#7a8ca1; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <h1>系統架構圖｜Django × Neon PostgreSQL × Render</h1>
+  <div class="sub">前台與後台共用同一套 Django ORM 與 Neon 資料庫；正式環境以 Gunicorn + WhiteNoise 提供服務。</div>
+
+  <div class="layer client">
+    <h2>使用者層（Browser）</h2>
+    <p>桌機／手機瀏覽器 · HTML／CSS／Vanilla JS · 響應式版面（RWD）· 鍵盤操作與螢幕閱讀器 · 大字模式／新手導引</p>
+  </div>
+  <div class="arrow">▼</div>
+
+  <div class="layer django">
+    <h2>應用層（Django 5.2 / Render Web Service）</h2>
+    <p>Server-rendered Templates · Session 會員登入 · CSRF 防護 · 表單驗證 · 訂票交易（transaction.atomic + select_for_update）</p>
+    <div class="modules">
+      <div class="module"><b>前台 Views／Templates</b><span>首頁、查詢、結果、比較、票價、訂票三步、完成、服務狀態、會員中心</span></div>
+      <div class="module"><b>會員與權限</b><span>登入／註冊／登出、login_required、會員中心、常用乘車人</span></div>
+      <div class="module"><b>Django Admin</b><span>會員、車站、班次、票價、車廂、訂單、公告、服務狀態</span></div>
+      <div class="module"><b>ORM／Services</b><span>search_trips、calculate_fare、create_booking、cancel_booking、QR code</span></div>
+    </div>
+  </div>
+  <div class="arrow">▼</div>
+
+  <div class="layer neon">
+    <h2>資料層（Neon PostgreSQL 18／production branch）</h2>
+    <p><span class="pill">neondb</span><span class="pill">24 張 public tables</span><span class="pill">pooled connection</span> 會員、車站、車種、班次、車廂、票種、票價規則、訂單、乘車人、公告、服務狀態</p>
+  </div>
+
+  <div class="side">
+    <div class="box"><b>部署與維運</b><p>Render Web Service（Singapore / Free）· Build：pip install → collectstatic → migrate → seed_demo · Start：gunicorn config.wsgi · Health check：/healthz/</p></div>
+    <div class="box"><b>開發與版本控制</b><p>GitHub repo · GitHub Actions（靜態原型 Pages）· OpenCode + Neon MCP + Render MCP · 本機 .venv + manage.py</p></div>
+  </div>
+  <div class="foot">資料來源：railway/models.py、config/settings.py、render.yaml、docs/BACKEND.md（2026/10/27 實測）</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#e9eef5; }
+  body { font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif; color:#14202b; }
+  .card { width:1160px; height:760px; margin:20px; background:#fff; border-radius:18px; overflow:hidden;
+          box-shadow:0 10px 30px rgba(15,30,50,.14); border:1px solid #cfdae7; display:flex; flex-direction:column; }
+  .bar { height:54px; background:#0f1b2d; color:#dce7f5; display:flex; align-items:center; padding:0 20px; gap:10px; }
+  .dots { display:flex; gap:7px; margin-right:8px; }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .d1 { background:#ff5f57; } .d2 { background:#febc2e; } .d3 { background:#28c840; }
+  .bar .name { font-weight:700; font-size:15px; letter-spacing:.5px; }
+  .bar .model { margin-left:auto; font-size:12px; color:#93a7c4; }
+  .meta { padding:12px 26px 6px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #e6edf5; }
+  .tag { background:#e8f0fb; color:#0b4f8f; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .stitle { font-size:15px; font-weight:700; color:#0f2742; }
+  .stime { margin-left:auto; font-size:12px; color:#6b7f95; }
+  .chat { padding:18px 26px 8px; flex:1; overflow:hidden; background:linear-gradient(#fbfdff,#f4f8fd);
+          display:flex; flex-direction:column; justify-content:center; }
+  .msg { display:flex; gap:12px; margin-bottom:14px; }
+  .avatar { width:34px; height:34px; border-radius:10px; flex:0 0 34px; display:flex; align-items:center; justify-content:center;
+             font-size:13px; font-weight:800; color:#fff; }
+  .u .avatar { background:#c43e06; }
+  .a .avatar { background:#0b4f8f; }
+  .body { flex:1; min-width:0; }
+  .who { font-size:12px; color:#6b7f95; margin:1px 0 5px; }
+  .bubble { border-radius:12px; padding:12px 15px; font-size:14.5px; line-height:1.55; }
+  .u .bubble { background:#fff; border:1px solid #dbe6f2; }
+  .a .bubble { background:#eef5ff; border:1px solid #d5e4f7; }
+  .prompt { font-size:14px; line-height:1.55; }
+  .ai-intro { font-weight:700; color:#0b3f70; margin-bottom:6px; }
+  .ai-list { margin:0; padding-left:18px; }
+  .ai-list li { margin:3px 0; }
+  .chips { padding:0 26px 8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { font-size:11px; color:#43505f; background:#eef2f7; border:1px solid #dbe3ec; border-radius:999px; padding:3px 9px; }
+  .foot { padding:8px 26px 12px; font-size:11px; color:#7a8ca1; border-top:1px solid #e6edf5; display:flex; gap:14px; }
+  .foot b { color:#43505f; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="bar">
+    <div class="dots"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+    <div class="name">OpenCode · 對話紀錄</div>
+    <div class="model">deepseek-v4.1-flash-free</div>
+  </div>
+  <div class="meta">
+    <div class="tag">RWD 修正</div>
+    <div class="stitle">手機版「出發時段」UI 跑版修正</div>
+    <div class="stime">2026/10/19 21:21</div>
+  </div>
+  <div class="chat">
+    <div class="msg u">
+      <div class="avatar">你</div>
+      <div class="body">
+        <div class="who">你 · 2026/10/19 21:21 · Session：手機頁面出發時段 UI 問題</div>
+        <div class="bubble prompt">在手機頁面中，出發時段的 UI 怪怪的</div>
+      </div>
+    </div>
+    <div class="msg a">
+      <div class="avatar">AI</div>
+      <div class="body">
+        <div class="who">OpenCode · deepseek-v4.1-flash-free</div>
+        <div class="bubble">
+          <div class="ai-intro">在 375px 的手機寬度下，出發時段欄位只有 144px 寬，兩個 select 各被壓縮到 56px。</div>
+          <ul class="ai-list"><li>原因是 grid-template-columns:1fr 1fr 1fr 寫在 inline style，不會被 media query 覆蓋。</li><li>把 A2 表單的 inline grid 改為 class（grid--stations、grid--3），讓斷點可以覆蓋。</li><li>將出發時段的 flex 容器改為 .tz-selects，手機版改為垂直排列。</li><li>用 375px 實際瀏覽器截圖驗證，修正後兩個 select 恢復可讀寬度。</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chips"><span class="chip">工具：browser</span><span class="chip">工具：read</span><span class="chip">工具：edit</span><span class="chip">工具：shell</span><span class="chip">Session：ses_eabd1bb2cffeNnF1luy7p59XDG</span><span class="chip">使用目的：修正手機版查詢表單的實際操作問題，確保 375px 寬度仍可選取時段。</span></div>
+  <div class="foot"><span><b>對應成果：</b>prototype/screens.js、prototype/styles.css、commit fb025af</span></div>
+</div>
+</body>
+</html>
