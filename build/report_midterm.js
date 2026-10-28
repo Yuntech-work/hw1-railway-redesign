@@ -271,7 +271,7 @@ B.push(pageBreak());
 B.push(h1('摘要'));
 B.push(p('本專題以「國營臺灣鐵路股份有限公司官方網站」為 Bad UI 案例，先以實際操作、截圖、Lighthouse 檢測與三類 Persona 情境走查，歸納出 8 項介面問題；再將問題轉化為 8 條使用者需求，完成 12 張重新設計分鏡，並進一步實作一套可操作的全端系統。'));
 B.push(p('系統以 Django 5.2 作為應用層，採 server-rendered templates 延續原型的 Design System；會員、車站、班次、車廂、票種、票價、訂單、乘車人、公告與服務狀態等 15 個模型儲存於 Neon PostgreSQL 18，後台使用 Django Admin 管理。前台提供任務導向首頁、多條件查詢、班次比較、票價說明、三步驟訂票、電子票 QR code、會員中心與服務異常替代方案；訪客可查詢，登入後才能訂票，訂票交易以資料庫鎖定避免超賣。'));
-B.push(p('系統部署於 Render，前台、後台與健康檢查均已上線；Django 13 個單元測試全數通過，公開站端對端 smoke test 20 項全數 PASS。報告亦收錄 12 組實際 AI Prompt 紀錄，說明每組的使用目的、AI 回覆與對應實作成果，並以 axe-core 4.12.1 進行無障礙檢測，誠實列出仍待改善的項目。'));
+B.push(p('系統部署於 Render，前台、後台與健康檢查均已上線；Django 13 個單元測試全數通過，公開站端對端 smoke test 20 項全數 PASS。報告亦收錄 11 組實際 AI Prompt 紀錄，說明每組的使用目的、AI 回覆與對應實作成果，並以 axe-core 4.12.1 進行無障礙檢測，誠實列出仍待改善的項目。'));
 B.push(new Paragraph({
   spacing: { before: 120, after: 0 },
   children: [t('關鍵詞：', { bold: true, size: 19 }), t('Bad UI、使用者經驗、Django、Neon PostgreSQL、Django Admin、Render、無障礙、AI 輔助開發', { size: 19 })]
@@ -286,7 +286,7 @@ const TOC = [
   ['3', '改善目的與網站規格', '改善目標、系統架構、網站地圖、Design System、資料模型'],
   ['4', '前端實作展示', '首頁、查詢、結果比較、會員登入前後、訂票流程、服務狀態'],
   ['5', '後台與資料庫', 'Django Admin、Neon PostgreSQL、資料管理與安全性'],
-  ['6', 'AI Prompt 使用紀錄（12 組）', '實際對話節錄、使用目的、AI 回覆與對應成果'],
+  ['6', 'AI Prompt 使用紀錄（11 組）', '實際對話節錄、使用目的、AI 回覆與對應成果'],
   ['7', '部署與測試結果', 'Render 部署、建置、13 個測試、20 項 smoke test、axe 檢測'],
   ['8', '結論與心得', '改善成果、遭遇問題、組員心得與未來展望'],
   ['附錄 A', '路由、帳號與環境變數', '完整路由、測試帳號、部署環境'],
@@ -357,7 +357,7 @@ B.push(table([2700, 3900, CONTENT - 6600], [
   ['Django 管理後台', '13 個模型註冊、MemberAdmin／BookingAdmin／TripAdmin 自訂、訂單取消退座 action', '圖 5-1～5-4'],
   ['Neon PostgreSQL', 'Neon production branch、24 張 public tables、psycopg2、pooled connection', '表 5-2、表 5-3'],
   ['雲端部署前後台連結', 'Render Web Service，前台、/admin/、/healthz/ 均上線', '表 7-1、表 7-2'],
-  ['至少 10 組 AI Prompt', '12 組實際 Prompt，含對話節錄、目的、AI 回覆與成果', '第 6 章'],
+  ['至少 10 組 AI Prompt', '11 組實際 Prompt，含對話節錄、目的、AI 回覆與成果', '第 6 章'],
   ['測試會員與管理員帳密', 'user／user123、admin／admin123', '表 1-3']
 ], { size: 17 }));
 
@@ -712,9 +712,9 @@ B.push(pageBreak());
 /* ============================================================
    6. AI Prompt 使用紀錄
    ============================================================ */
-B.push(h1('6. AI Prompt 使用紀錄（12 組）'));
-B.push(p('本章收錄 12 組在 hw1 專案中實際使用的 AI Prompt。每一組都包含：對話截圖（節錄）、Prompt 原文、使用目的、AI 回覆摘要、對應實作成果與證據位置。'));
-B.push(p('12 組 Prompt 分別來自五個 OpenCode session：後端開發（ses_e847…）、手機版 RWD 修正（ses_eabd…）、靜態原型雲端部署（ses_eabe…）、Bad UI 分析（ses_ee0a…）與報告排版（ses_ee08…）。卡片上的時間、模型與 Session ID 均為實際值。'));
+B.push(h1('6. AI Prompt 使用紀錄（11 組）'));
+B.push(p('本章收錄 11 組在 hw1 專案中實際使用的 AI Prompt。每一組都包含：對話截圖（節錄）、Prompt 原文、使用目的、AI 回覆摘要、對應實作成果與證據位置。'));
+B.push(p('11 組 Prompt 分別來自五個 OpenCode session：後端開發（ses_e847…）、手機版 RWD 修正（ses_eabd…）、靜態原型雲端部署（ses_eabe…）、Bad UI 分析（ses_ee0a…）與報告排版（ses_ee08…）。卡片上的時間、模型與 Session ID 均為實際值。'));
 B.push(...noteBox('關於對話截圖的呈現方式', [
   '為統一版面，本章卡片以相同的 OpenCode 對話樣式重新排版；文字逐字節錄自實際 session 匯出檔，沒有事後改寫或虛構。',
   '每張卡片都標示 Session ID，可用 `opencode session export <session-id>` 重新匯出完整逐字稿比對。',
@@ -813,15 +813,6 @@ const AI_CASES = [
     evidence: 'assets/badui/、assets/redesign/、HW1 報告'
   },
   {
-    id: '11', title: 'Word 報告分組名單與組員貢獻', tag: '報告排版',
-    time: '2026/10/09 02:22', session: 'ses_ee087a1e7ffdUvHfxXVACxFs2g',
-    prompt: '幫我在 word 文件的目錄前面位置加上分組名單：分組編號、組員姓名／學號的填寫欄位。',
-    purpose: '讓報告有正式的分組名單與貢獻比例，並保持 Word 與 PDF 一致。',
-    ai: '修改 build/report.js 產生器而不是手改 XML；新增分組名單表格、rowFill／rowHeight 選項與文末組員貢獻章節；把已在 Word 手動填好的第 13 組名單寫回產生器，重新產出 docx 並以 Word COM 轉 PDF。',
-    result: 'build/report.js、封面分組名單、IX. 組員貢獻、38 頁 docx／pdf。',
-    evidence: 'build/report.js、output/ 舊版報告'
-  },
-  {
     id: '12', title: '生成式 AI 使用標注', tag: 'AI 聲明',
     time: '2026/10/09 02:46', session: 'ses_ee087a1e7ffdUvHfxXVACxFs2g',
     prompt: '順便在合適的地方加上標注，若使用生成式 AI 協助分析、文字整理或介面設計，須於文件中附上使用工具名稱。',
@@ -850,12 +841,12 @@ AI_CASES.forEach((c, i) => {
   if (i < AI_CASES.length - 1) B.push(pageBreak());
 });
 
-B.push(h2('6.13　AI 使用模式與人工覆核'));
-B.push(p('12 組 Prompt 可歸納為四種使用模式：'));
+B.push(h2('6.12　AI 使用模式與人工覆核'));
+B.push(p('11 組 Prompt 可歸納為四種使用模式：'));
 B.push(bullet([t('規劃型：', { bold: true }), t('先要求 AI 讀專題要求與現有程式，提出架構、資料模型與施工順序，確認後才動工（第 6.1 組）。')]));
-B.push(bullet([t('產出型：', { bold: true }), t('由 AI 產生 Django models、views、templates、CSS 與報告產生器，組員逐項檢視與修改（第 6.2、6.3、6.8、6.11 組）。')]));
+B.push(bullet([t('產出型：', { bold: true }), t('由 AI 產生 Django models、views、templates、CSS，組員逐項檢視與修改（第 6.2、6.3、6.8 組）。')]));
 B.push(bullet([t('排錯型：', { bold: true }), t('把實際錯誤訊息、Lighthouse 結果或手機截圖貼給 AI，請它診斷原因並提出修正（第 6.4、6.6、6.7、6.9 組）。')]));
-B.push(bullet([t('文件型：', { bold: true }), t('用 AI 整理問題分析、AI 使用聲明、組員貢獻與報告版面（第 6.10、6.12 組）。')]));
+B.push(bullet([t('文件型：', { bold: true }), t('用 AI 整理問題分析、AI 使用聲明與報告版面（第 6.10、6.11 組）。')]));
 B.push(p('人工覆核方式包括：回到原始網站實際操作、以 375px 與 1440px 實際截圖、執行 npm run build／npm test／smoke_test、以 axe-core 檢測無障礙、以及逐項對照程式碼與資料庫。AI 產出不是直接貼上，而是經過「重現問題 → 修正 → 再驗證」的循環。'));
 B.push(pageBreak());
 
@@ -1036,7 +1027,7 @@ B.push(table([1900, 4000, CONTENT - 5900], [
   ['Neon MCP', '查詢 Neon 專案、branch、資料表 schema 與資料量', '以 psql／Django ORM 交叉查詢確認'],
   ['Render MCP／API', '查詢服務狀態、部署狀態、環境設定', '以公開網址、healthz 與 smoke test 驗證']
 ].map((r, i) => r.map((c, j) => (i === 0 ? t(c, { bold: true, size: 17 }) : (j === 0 ? t(c, { bold: true, size: 16 }) : t(c, { size: 15 })))))));
-B.push(p('本報告第 6 章的 12 組 Prompt 均取自本專案 OpenCode session 匯出檔，卡片以統一視覺重排，文字逐字節錄，沒有事後虛構。所有 AI 產出均經組員人工覆核後才納入系統與報告。', { size: 17, color: '43505F' }));
+B.push(p('本報告第 6 章的 11 組 Prompt 均取自本專案 OpenCode session 匯出檔，卡片以統一視覺重排，文字逐字節錄，沒有事後虛構。所有 AI 產出均經組員人工覆核後才納入系統與報告。', { size: 17, color: '43505F' }));
 
 B.push(h1('附錄 C　參考資料'));
 B.push(bullet('國營臺灣鐵路股份有限公司官方網站：https://www.railway.gov.tw/'));
